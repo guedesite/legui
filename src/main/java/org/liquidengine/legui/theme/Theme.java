@@ -1,14 +1,16 @@
 package org.liquidengine.legui.theme;
 
+import java.util.List;
 import org.liquidengine.legui.component.Component;
 import org.liquidengine.legui.component.Frame;
+import org.liquidengine.legui.component.Layer;
 
 /**
  * Created by ShchAlexander on 2/6/2017.
  */
 public abstract class Theme {
 
-    private final ThemeManager themeManager;
+    private ThemeManager themeManager;
 
     protected Theme(ThemeManager themeManager) {
         this.themeManager = themeManager;
@@ -19,14 +21,19 @@ public abstract class Theme {
     }
 
     public <T extends Component> void apply(T component) {
-        themeManager.getComponentTheme((Class<T>) component.getClass()).apply(component);
+        AbstractTheme<T> componentTheme = themeManager.getComponentTheme((Class<T>) component.getClass());
+        componentTheme.apply(component);
     }
 
     public <T extends Component> void applyAll(T component) {
-        themeManager.getComponentTheme((Class<T>) component.getClass()).applyAll(component);
+        AbstractTheme<T> componentTheme = themeManager.getComponentTheme((Class<T>) component.getClass());
+        componentTheme.applyAll(component);
     }
 
     public void applyAll(Frame frame) {
-        frame.getAllLayers().forEach(this::applyAll);
+        List<Layer> allLayers = frame.getAllLayers();
+        for (Layer allLayer : allLayers) {
+            applyAll(allLayer.getContainer());
+        }
     }
 }

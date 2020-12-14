@@ -1,5 +1,9 @@
 package org.liquidengine.legui.component;
 
+import static org.liquidengine.legui.style.font.FontRegistry.MATERIAL_ICONS_REGULAR;
+
+import java.util.List;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -15,10 +19,6 @@ import org.liquidengine.legui.icon.Icon;
 import org.liquidengine.legui.listener.EventListener;
 import org.liquidengine.legui.style.color.ColorConstants;
 import org.liquidengine.legui.theme.Themes;
-
-import java.util.List;
-
-import static org.liquidengine.legui.style.font.FontRegistry.MATERIAL_ICONS_REGULAR;
 
 /**
  * An implementation of a check box -- an item that can be selected or deselected, and which displays its state to the user.
@@ -143,9 +143,7 @@ public class CheckBox extends Component implements TextComponent {
      * @param iconUnchecked checkbox icon for non-selected state to set.
      */
     public void setIconUnchecked(Icon iconUnchecked) {
-        if (iconUnchecked != null) {
-            this.iconUnchecked = iconUnchecked;
-        }
+        this.iconUnchecked = iconUnchecked;
     }
 
     /**

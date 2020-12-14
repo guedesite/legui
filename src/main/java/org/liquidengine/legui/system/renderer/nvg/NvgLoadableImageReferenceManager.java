@@ -1,30 +1,38 @@
 package org.liquidengine.legui.system.renderer.nvg;
 
+import static org.lwjgl.opengl.GL11.glGetInteger;
+import static org.lwjgl.opengl.GL30.GL_MAJOR_VERSION;
+import static org.lwjgl.opengl.GL30.GL_MINOR_VERSION;
+
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
+import java.awt.image.ConvolveOp;
+import java.awt.image.Kernel;
+import java.nio.ByteBuffer;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import org.liquidengine.legui.image.FBOImage;
+import org.liquidengine.legui.image.LoadableGif;
 import org.liquidengine.legui.image.LoadableImage;
 import org.lwjgl.nanovg.NanoVG;
 import org.lwjgl.nanovg.NanoVGGL2;
 import org.lwjgl.nanovg.NanoVGGL3;
 
-import java.nio.ByteBuffer;
-import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.*;
-
-import static org.lwjgl.opengl.GL11.glGetInteger;
-import static org.lwjgl.opengl.GL30.GL_MAJOR_VERSION;
-import static org.lwjgl.opengl.GL30.GL_MINOR_VERSION;
-
 /**
  * Created by ShchAlexander on 1/26/2017.
  */
 public class NvgLoadableImageReferenceManager {
-    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * BufferedImage queue to remove.
@@ -113,17 +121,61 @@ public class NvgLoadableImageReferenceManager {
             String path = image.getPath();
             if (path != null) {
                 try {
-                    imageRef = imageCache.get(path, createNewImageReference(image, context));
+                	if(image.HasChange)
+                	{
+                		imageRef = DirectcreateNewImageReference(image, context);
+                		imageCache.put(path, imageRef);
+                		image.HasChange = false;
+      
+                	}
+                	else {
+                		 imageRef = imageCache.get(path, createNewImageReference(image, context)); 
+                	}
+                //	imageRef = createNewImageReference(image, context);
                 } catch (ExecutionException e) {
-                    LOGGER.error(e.getMessage(), e);
-                }
+                    e.printStackTrace();
+                } 
             } else {
                 return 0;
             }
         }
         return imageRef;
     }
-
+    
+    public int getGifReference(LoadableGif image, long context) {
+        Integer imageRef = 0;
+        if (image != null) {
+        	
+            String path = image.getPath();
+            if (path != null) {
+               
+           
+                    try {
+                    	ByteBuffer imageData = image.getImageData();
+						imageRef = imageCache.get(path+"-frame-"+image.getFrame(), createNewGifReference(image, context, imageData));
+					} catch (ExecutionException e) {
+				
+						e.printStackTrace();
+					} 
+               
+            } else {
+                return 0;
+            }
+        }
+        return imageRef;
+    }
+    private Callable<Integer> createNewGifReference(LoadableGif image, long context, ByteBuffer imageData) {
+        return () -> {
+            Integer reference = 0;
+            if (imageData != null) {
+                int width = image.getWidth();
+                int height = image.getHeight();
+                reference = NanoVG.nvgCreateImageRGBA(context, width, height, 0, imageData);
+            }
+            imageAssociationMap.put(image.getPath(), reference);
+            return reference;
+        };
+    } 
     private Callable<Integer> createNewImageReference(LoadableImage image, long context) {
         return () -> {
             Integer reference = 0;
@@ -136,7 +188,22 @@ public class NvgLoadableImageReferenceManager {
             imageAssociationMap.put(image.getPath(), reference);
             return reference;
         };
-    }
+    } 
+    
+    private Integer DirectcreateNewImageReference(LoadableImage image, long context) {
+       
+            Integer reference = 0;
+            ByteBuffer imageData = image.getImageData();
+            if (imageData != null) {
+                int width = image.getWidth();
+                int height = image.getHeight();
+                reference = NanoVG.nvgCreateImageRGBA(context, width, height, 0, imageData);
+            }
+            imageAssociationMap.put(image.getPath(), reference);
+            return reference;
+    } 
+    
+ 
 
     public int getImageReference(FBOImage image, long context) {
         Integer imageRef = 0;
@@ -147,7 +214,7 @@ public class NvgLoadableImageReferenceManager {
                 try {
                     imageRef = imageCache.get(path, createNewImageReference(image, context));
                 } catch (ExecutionException e) {
-                    LOGGER.error(e.getMessage(), e);
+                    e.printStackTrace();
                 }
             } else {
                 return 0;
@@ -177,6 +244,7 @@ public class NvgLoadableImageReferenceManager {
         };
     }
 
+    
     /**
      * Used to destroy image reference manager.
      */

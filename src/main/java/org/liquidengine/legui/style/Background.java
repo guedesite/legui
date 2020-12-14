@@ -12,7 +12,7 @@ import org.liquidengine.legui.style.color.ColorConstants;
  */
 public class Background {
 
-    private Vector4f color = null;
+    private Vector4f color = ColorConstants.transparent();
     private Icon icon;
     private Vector2f position;
     private Vector2f size;
@@ -54,6 +54,10 @@ public class Background {
         color.set(r, g, b, a);
     }
 
+    
+    public void DefineColor(float r, float g, float b, float a) {
+    	color = new Vector4f(r, g, b, a);
+    }
     /**
      * Gets icon.
      *

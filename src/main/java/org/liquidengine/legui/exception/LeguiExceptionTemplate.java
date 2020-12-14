@@ -8,6 +8,10 @@ public enum LeguiExceptionTemplate {
      * Unhandled exception.
      */
     UNHANDLED_EXCEPTION("Unhandled exception: %s"),
+  
+    MARSHAL_EXCEPTION("Can't marshal your component"),
+    
+    UNMARSHAL_EXCEPTION("Can't unmarshal your component"),
     /**
      * Used by {@link org.liquidengine.legui.style.font.Font}.
      */

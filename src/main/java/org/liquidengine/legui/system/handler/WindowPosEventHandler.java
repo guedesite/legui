@@ -1,5 +1,6 @@
 package org.liquidengine.legui.system.handler;
 
+import java.util.List;
 import org.liquidengine.legui.component.Component;
 import org.liquidengine.legui.component.Frame;
 import org.liquidengine.legui.component.Layer;
@@ -7,8 +8,6 @@ import org.liquidengine.legui.event.WindowPosEvent;
 import org.liquidengine.legui.listener.processor.EventProcessorProvider;
 import org.liquidengine.legui.system.context.Context;
 import org.liquidengine.legui.system.event.SystemWindowPosEvent;
-
-import java.util.List;
 
 /**
  * This class instance used to handle {@link WindowPosEvent}.
@@ -26,7 +25,7 @@ public class WindowPosEventHandler extends AbstractSystemEventHandler<SystemWind
      */
     @Override
     protected boolean handle(SystemWindowPosEvent event, Layer layer, Context context, Frame frame) {
-        pushEvent(layer, event, context, frame);
+        pushEvent(layer.getContainer(), event, context, frame);
         return false;
     }
 

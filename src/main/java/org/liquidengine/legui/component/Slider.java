@@ -153,8 +153,7 @@ public class Slider extends Component {
         getListenerMap().addListener(ScrollEvent.class, new SliderScrollEventListener());
         getListenerMap().addListener(MouseClickEvent.class, new SliderMouseClickEventListener());
         getListenerMap().addListener(MouseDragEvent.class, new SliderMouseDragEventListener());
-        Themes.getDefaultTheme().getThemeManager().getComponentTheme(Slider.class).applyAll(this);
-    }
+         }
 
     /**
      * Returns the minimum value.

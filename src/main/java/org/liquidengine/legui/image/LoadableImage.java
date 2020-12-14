@@ -1,11 +1,10 @@
 package org.liquidengine.legui.image;
 
+import java.nio.ByteBuffer;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-
-import java.nio.ByteBuffer;
 
 /**
  * Represent image source.
@@ -16,6 +15,8 @@ public abstract class LoadableImage extends Image {
      * Path to image source.
      */
     private String path;
+    
+    
 
 
     /**

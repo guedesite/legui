@@ -16,14 +16,24 @@ public class TextInputMouseClickEventListener implements MouseClickEventListener
      */
     @Override
     public void process(MouseClickEvent event) {
-        TextInput gui = (TextInput) event.getTargetComponent();
-        int mouseCaretPosition = gui.getMouseCaretPosition();
-        if (event.getAction() == MouseClickEvent.MouseClickAction.PRESS) {
-            gui.setCaretPosition(mouseCaretPosition);
-            gui.setEndSelectionIndex(mouseCaretPosition);
-            if (!event.isModShift()) {
-                gui.setStartSelectionIndex(mouseCaretPosition);
-            }
-        }
+    	
+    		 TextInput gui = (TextInput) event.getTargetComponent();
+    		 if(gui.getTextState().getText().equals("Pseudo") || gui.getTextState().getText().equals("Mot de passe"))
+    		 {
+    			 gui.getTextState().setText("");
+    		 }
+    		 int mouseCaretPosition = gui.getMouseCaretPosition();
+    	        if (event.getAction() == MouseClickEvent.MouseClickAction.PRESS) {
+    	            gui.setCaretPosition(mouseCaretPosition);
+    	            gui.setEndSelectionIndex(mouseCaretPosition);
+    	            if (!event.isModShift()) {
+    	                gui.setStartSelectionIndex(mouseCaretPosition);
+    	            }
+    	        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null && (obj == this || obj.getClass() == this.getClass());
     }
 }

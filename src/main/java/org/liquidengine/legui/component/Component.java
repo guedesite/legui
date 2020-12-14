@@ -1,5 +1,17 @@
 package org.liquidengine.legui.component;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -7,23 +19,13 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.joml.Vector2f;
 import org.liquidengine.legui.component.misc.listener.component.TabKeyEventListener;
 import org.liquidengine.legui.component.misc.listener.component.TooltipCursorEnterListener;
-import org.liquidengine.legui.event.AddChildEvent;
 import org.liquidengine.legui.event.CursorEnterEvent;
 import org.liquidengine.legui.event.KeyEvent;
-import org.liquidengine.legui.event.RemoveChildEvent;
 import org.liquidengine.legui.intersection.Intersector;
 import org.liquidengine.legui.intersection.RectangleIntersector;
 import org.liquidengine.legui.listener.ListenerMap;
-import org.liquidengine.legui.listener.processor.EventProcessorProvider;
 import org.liquidengine.legui.style.Style;
 import org.liquidengine.legui.theme.Themes;
-
-import java.io.Serializable;
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 /**
  * Component is an object that have graphical representation in legui system.
@@ -35,7 +37,7 @@ public abstract class Component implements Serializable {
     /**
      * Metadata map, place where renderers or event processors can store state of component.
      */
-    private final Map<String, Object> metadata = new HashMap<>();
+    private Map<String, Object> metadata = new HashMap<>();
     /**
      * Parent component container. For root components it could be null.
      */
@@ -50,6 +52,7 @@ public abstract class Component implements Serializable {
      * If component is the root component then position calculated relative window top left corner.
      */
     private Vector2f position = new Vector2f();
+    private Vector2f oldposition = new Vector2f();
     /**
      * Size of component.
      */
@@ -90,6 +93,7 @@ public abstract class Component implements Serializable {
      */
     private boolean tabFocusable = true;
 
+    public boolean hasBorder = false;
     /**
      * Show if component can be focused.
      * <br><b>Note! You should take in consideration that component that marked as non-focusable will not receive any events.
@@ -108,29 +112,75 @@ public abstract class Component implements Serializable {
     /**
      * Component style.
      */
-    private final Style hoveredStyle = new Style();
+    private Style hoveredStyle = new Style();
     /**
      * Component style.
      */
-    private final Style focusedStyle = new Style();
+    private Style focusedStyle = new Style();
     /**
      * Component style.
      */
-    private final Style pressedStyle = new Style();
+    private Style pressedStyle = new Style();
     /**
      * List of child components.
      */
-    private final List<Component> childComponents = new CopyOnWriteArrayList<>();
+    private List<Component> childComponents = new CopyOnWriteArrayList<>();
 
     /**
      * Default constructor. Used to create component instance without any parameters.
      * <p>
      * Also if you want to make it easy to use with Json marshaller/unmarshaller component should contain empty constructor.
      */
+    
+    public void addXSize(float x)
+    {
+    	size.x +=x;
+    }
+    
+    public void addYSize(float y)
+    {
+    	size.y +=y;
+    }
+    
+    public void addXPos(float x)
+    {
+    	position.x +=x;
+    }
+    
+    public void addYPos(float y)
+    {
+    	position.y +=y;
+    }
+    
+    public void setXPos(float x)
+    {
+    	position.x =x;
+    }
+    
+    public void setYPos(float y)
+    {
+    	position.y =y;
+    }
+    
     public Component() {
         this(0, 0, 10, 10);
     }
 
+    public float getOldXPos()
+    {
+    	return oldposition.x;
+    }
+    
+    public float getOldYPos()
+    {
+    	return oldposition.y;
+    }
+    
+    
+    
+    public void savePosition() {
+    	oldposition = new Vector2f(position);
+    }
     /**
      * Constructor with position and size parameters.
      *
@@ -197,8 +247,7 @@ public abstract class Component implements Serializable {
     private void initialize() {
         getListenerMap().addListener(CursorEnterEvent.class, new TooltipCursorEnterListener());
         getListenerMap().addListener(KeyEvent.class, new TabKeyEventListener());
-        Themes.getDefaultTheme().getThemeManager().getComponentTheme(Component.class).applyAll(this);
-    }
+         }
 
     /**
      * Returns parent component. If returns null - current component is root component.
@@ -600,18 +649,10 @@ public abstract class Component implements Serializable {
             return false;
         }
         boolean added = childComponents.add(component);
-        changeParent(component);
-        EventProcessorProvider.getInstance().pushEvent(new AddChildEvent<>(this, component));
-        return added;
-    }
-
-    public void add(int index, Component component) {
-        if (component == null || component == this || isContains(component)) {
-            return;
+        if (added) {
+            changeParent(component);
         }
-        childComponents.add(index, component);
-        changeParent(component);
-        EventProcessorProvider.getInstance().pushEvent(new AddChildEvent<>(this, component));
+        return added;
     }
 
     /**
@@ -663,21 +704,13 @@ public abstract class Component implements Serializable {
             Component p = component.getParent();
             if (p == this && isContains(component)) {
                 boolean removed = childComponents.remove(component);
-                component.setParent(null);
-                EventProcessorProvider.getInstance().pushEvent(new RemoveChildEvent<>(this, component));
+                if (removed) {
+                    component.setParent(null);
+                }
                 return removed;
             }
         }
         return false;
-    }
-
-    public Component remove(int index) {
-        Component component = childComponents.remove(index);
-        if (component != null) {
-            component.setParent(null);
-            EventProcessorProvider.getInstance().pushEvent(new RemoveChildEvent<>(this, component));
-        }
-        return component;
     }
 
     /**
@@ -764,6 +797,11 @@ public abstract class Component implements Serializable {
         return new ArrayList<>(childComponents);
     }
 
+    
+    public ArrayList<Component> getSpecChildComponents() {
+        return (ArrayList<Component>) childComponents;
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -777,59 +815,55 @@ public abstract class Component implements Serializable {
         Component component = (Component) o;
 
         return new EqualsBuilder()
-            .append(this.isEnabled(), component.isEnabled())
-            .append(this.isVisible(), component.isVisible())
-            .append(this.isHovered(), component.isHovered())
-            .append(this.isFocused(), component.isFocused())
-            .append(this.isPressed(), component.isPressed())
-            .append(this.getPosition(), component.getPosition())
-            .append(this.getSize(), component.getSize())
-            .append(this.getIntersector(), component.getIntersector())
-            .append(this.getTabIndex(), component.getTabIndex())
-            .append(this.isTabFocusable(), component.isTabFocusable())
-            .append(this.isFocusable(), component.isFocusable())
-            .append(childComponents, component.childComponents)
-            .isEquals();
+                .append(this.isEnabled(), component.isEnabled())
+                .append(this.isVisible(), component.isVisible())
+                .append(this.isHovered(), component.isHovered())
+                .append(this.isFocused(), component.isFocused())
+                .append(this.isPressed(), component.isPressed())
+                .append(this.getListenerMap(), component.getListenerMap())
+                .append(this.getPosition(), component.getPosition())
+                .append(this.getSize(), component.getSize())
+                .append(this.getIntersector(), component.getIntersector())
+                .append(this.getTabIndex(), component.getTabIndex())
+                .append(this.isTabFocusable(), component.isTabFocusable())
+                .append(this.isFocusable(), component.isFocusable())
+                .append(childComponents, component.childComponents)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-            .append(position)
-            .append(size)
-            .append(enabled)
-            .append(intersector)
-            .append(hovered)
-            .append(focused)
-            .append(pressed)
-            .append(tabIndex)
-            .append(tabFocusable)
-            .append(focusable)
-            .append(childComponents)
-            .toHashCode();
+                .append(listenerMap)
+                .append(position)
+                .append(size)
+                .append(enabled)
+                .append(intersector)
+                .append(hovered)
+                .append(focused)
+                .append(pressed)
+                .append(tabIndex)
+                .append(tabFocusable)
+                .append(focusable)
+                .append(childComponents)
+                .toHashCode();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
-            .append("position", position)
-            .append("size", size)
-            .append("enabled", enabled)
-            .append("intersector", intersector)
-            .append("hovered", hovered)
-            .append("focused", focused)
-            .append("tabIndex", tabIndex)
-            .append("tabFocusable", tabFocusable)
-            .append("focusable", focusable)
-            .append("pressed", pressed)
-            .toString();
+                .append("listenerMap", listenerMap)
+                .append("position", position)
+                .append("size", size)
+                .append("enabled", enabled)
+                .append("intersector", intersector)
+                .append("hovered", hovered)
+                .append("focused", focused)
+                .append("tabIndex", tabIndex)
+                .append("tabFocusable", tabFocusable)
+                .append("focusable", focusable)
+                .append("pressed", pressed)
+                .toString();
     }
 
-    public int indexOfChild(Component component) {
-        return childComponents.indexOf(component);
-    }
-
-    public Frame getFrame() {
-        return parent == null ? null : parent.getFrame();
-    }
 }

@@ -5,6 +5,7 @@ package org.liquidengine.legui.image;
  */
 public abstract class Image {
 
+	public boolean HasChange = true;
     /**
      * Returns image width.
      *

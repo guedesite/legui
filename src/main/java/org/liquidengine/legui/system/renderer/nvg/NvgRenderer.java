@@ -1,5 +1,19 @@
 package org.liquidengine.legui.system.renderer.nvg;
 
+import static org.lwjgl.nanovg.NanoVG.nvgBeginFrame;
+import static org.lwjgl.nanovg.NanoVG.nvgCreateFontMem;
+import static org.lwjgl.nanovg.NanoVG.nvgEndFrame;
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glGetInteger;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.joml.Vector2fc;
 import org.joml.Vector2i;
 import org.liquidengine.legui.component.Component;
@@ -18,12 +32,6 @@ import org.lwjgl.nanovg.NanoVGGL2;
 import org.lwjgl.nanovg.NanoVGGL3;
 import org.lwjgl.opengl.GL30;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static org.lwjgl.nanovg.NanoVG.*;
-import static org.lwjgl.opengl.GL11.*;
-
 /**
  * Created by ShchAlexander on 1/26/2017.
  */
@@ -32,7 +40,7 @@ public class NvgRenderer extends AbstractRenderer {
     public static final String NVG_CONTEXT = "NVG_CONTEXT";
     public static final String IMAGE_REFERENCE_MANAGER = "IMAGE_REFERENCE_MANAGER";
     protected Map<String, Font> loadedFonts = new ConcurrentHashMap<>();
-    private long nvgContext;
+    public long nvgContext;
     private NvgLoadableImageReferenceManager imageReferenceManager;
     private boolean isVersionNew;
 
@@ -42,7 +50,8 @@ public class NvgRenderer extends AbstractRenderer {
      * @param component component for which should be rendered border.
      * @param context context.
      */
-    public static void renderBorder(Component component, Context context) {
+    @SuppressWarnings("unchecked")
+	public static void renderBorder(Component component, Context context) {
         Border border = component.getStyle().getBorder();
         if (border != null && border.isEnabled()) {
             // Render border
@@ -73,7 +82,8 @@ public class NvgRenderer extends AbstractRenderer {
      * @param component icon owner.
      * @param context context.
      */
-    public static void renderIcon(Icon icon, Component component, Context context) {
+    @SuppressWarnings("unchecked")
+	public static void renderIcon(Icon icon, Component component, Context context) {
         if (icon != null && component != null) {
             RendererProvider.getInstance().getIconRenderer(icon.getClass()).render(icon, component, context);
         }
@@ -142,8 +152,8 @@ public class NvgRenderer extends AbstractRenderer {
         glEnable(GL_DEPTH_TEST);
 
         imageReferenceManager.removeOldImages(nvgContext);
-        context.getContextData().remove(NVG_CONTEXT);
-        context.getContextData().remove(IMAGE_REFERENCE_MANAGER);
+        context.getContextData().remove(NVG_CONTEXT, nvgContext);
+        context.getContextData().remove(IMAGE_REFERENCE_MANAGER, imageReferenceManager);
     }
 
     @Override

@@ -1,5 +1,8 @@
 package org.liquidengine.legui.system.handler;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.joml.Vector2f;
 import org.liquidengine.legui.component.Component;
 import org.liquidengine.legui.component.Frame;
@@ -11,9 +14,6 @@ import org.liquidengine.legui.input.Mouse;
 import org.liquidengine.legui.listener.processor.EventProcessorProvider;
 import org.liquidengine.legui.system.context.Context;
 import org.liquidengine.legui.system.event.SystemCursorPosEvent;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Cursor position event handler.
@@ -36,7 +36,7 @@ public class CursorPosEventHandler extends AbstractSystemEventHandler<SystemCurs
         Collections.reverse(allLayers);
         Component targetComponent = null;
         for (Layer layer : allLayers) {
-            if (!layer.isEventReceivable() || !layer.isVisible() || !layer.isEnabled()) {
+            if (!layer.isEventReceivable() || !layer.getContainer().isVisible() || !layer.getContainer().isEnabled()) {
                 continue;
             }
             targetComponent = SehUtil.getTargetComponent(layer, cursorPosition);
@@ -73,7 +73,7 @@ public class CursorPosEventHandler extends AbstractSystemEventHandler<SystemCurs
      */
     @Override
     protected boolean handle(SystemCursorPosEvent event, Layer layer, Context context, Frame frame) {
-        List<Component> childComponents = layer.getChildComponents();
+        List<Component> childComponents = layer.getContainer().getChildComponents();
         for (Component child : childComponents) {
             handle(child, context, frame);
         }

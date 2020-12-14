@@ -1,14 +1,17 @@
 package org.liquidengine.legui.system.renderer.nvg.image;
 
 import org.joml.Vector2fc;
+import org.joml.Vector4f;
 import org.liquidengine.legui.image.LoadableImage;
 import org.liquidengine.legui.system.context.Context;
 import org.liquidengine.legui.system.renderer.nvg.NvgImageRenderer;
 import org.liquidengine.legui.system.renderer.nvg.NvgLoadableImageReferenceManager;
+import org.lwjgl.nanovg.NVGPaint;
 
 import java.util.Map;
 
 import static org.liquidengine.legui.system.renderer.nvg.NvgRenderer.IMAGE_REFERENCE_MANAGER;
+import static org.lwjgl.nanovg.NanoVG.*;
 
 /**
  * Created by ShchAlexander on 3/31/2017.
@@ -29,6 +32,7 @@ public class NvgLoadableImageRenderer<I extends LoadableImage> extends NvgImageR
     @Override
     protected void renderImage(I image, Vector2fc position, Vector2fc size, Map<String, Object> properties, Context context, long nanovg) {
 
+    	
         NvgLoadableImageReferenceManager manager = (NvgLoadableImageReferenceManager) context.getContextData().get(IMAGE_REFERENCE_MANAGER);
         int imageRef = manager.getImageReference(image, nanovg);
 

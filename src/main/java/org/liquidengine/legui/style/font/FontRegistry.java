@@ -2,16 +2,12 @@ package org.liquidengine.legui.style.font;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Created by ShchAlexander on 1/26/2017.
  */
 public class FontRegistry {
-    private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      * Default entypo font.
@@ -41,32 +37,33 @@ public class FontRegistry {
      * Default material-design-icons font.
      */
     public static final String MATERIAL_DESIGN_ICONS = "materialdesignicons";
+    
+    public static final String NEO_COMMUN_BOLD = "NEOCOMMUNBOLD";
+    public static final String NEO_COMMUN_HEAVY = "NEOCOMMUNHEAVY";
+    public static final String NEO_COMMUN_REGULAR = "NEOCOMMUNREGULAR";
+    
+    public static final String NEO_BRUTE_REGULAR = "NEOBRUTEREGULAR";
     /**
      * Font used by default. {@link #ROBOTO_BOLD}.
      */
-    private static String defaultFont = ROBOTO_LIGHT;
-
-    public static String getDefaultFont() {
-        return defaultFont;
-    }
-
-    public static void setDefaultFont(String defaultFont) {
-        FontRegistry.defaultFont = Objects.requireNonNull(defaultFont);
-    }
-
+    public static final String DEFAULT = ROBOTO_LIGHT;
     /**
      * Font register.
      */
     private static final Map<String, Font> fontRegister = new ConcurrentHashMap<>();
 
     static {
-        registerFont(ENTYPO, "org/liquidengine/legui/style/font/entypo.ttf");
-        registerFont(ROBOTO_BOLD, "org/liquidengine/legui/style/font/Roboto-Bold.ttf");
-        registerFont(ROBOTO_LIGHT, "org/liquidengine/legui/style/font/Roboto-Light.ttf");
-        registerFont(ROBOTO_REGULAR, "org/liquidengine/legui/style/font/Roboto-Regular.ttf");
-        registerFont(MATERIAL_ICONS_REGULAR, "org/liquidengine/legui/style/font/MaterialIcons-Regular.ttf");
-        registerFont(FONT_AWESOME_ICONS, "org/liquidengine/legui/style/font/FontAwesome.otf");
-        registerFont(MATERIAL_DESIGN_ICONS, "org/liquidengine/legui/style/font/materialdesignicons.ttf");
+        registerFont(ENTYPO, GetFilePath()+"assets/launcher/font/entypo.ttf");
+        registerFont(ROBOTO_BOLD, GetFilePath()+"assets/launcher/font/Roboto-Bold.ttf");
+        registerFont(ROBOTO_LIGHT, GetFilePath()+"assets/launcher/font/Roboto-Light.ttf");
+        registerFont(ROBOTO_REGULAR, GetFilePath()+"assets/launcher/font/Roboto-Regular.ttf");
+        registerFont(MATERIAL_ICONS_REGULAR, GetFilePath()+"assets/launcher/font/MaterialIcons-Regular.ttf");
+        registerFont(FONT_AWESOME_ICONS, GetFilePath()+"assets/launcher/font/FontAwesome.otf");
+        registerFont(MATERIAL_DESIGN_ICONS, GetFilePath()+"assets/launcher/font/materialdesignicons.ttf"); 
+        registerFont(NEO_COMMUN_BOLD, GetFilePath()+"assets/launcher/font/Oswald-Bold.ttf");
+        registerFont(NEO_COMMUN_HEAVY, GetFilePath()+"assets/launcher/font/Oswald-Heavy.ttf");
+        registerFont(NEO_COMMUN_REGULAR,GetFilePath()+ "assets/launcher/font/Oswald-Regular.ttf");
+        registerFont(NEO_BRUTE_REGULAR, GetFilePath()+"assets/launcher/font/Bebas-Regular.otf"); 
     }
 
     /**
@@ -75,6 +72,26 @@ public class FontRegistry {
     private FontRegistry() {
     }
 
+    
+public static String path;
+	
+	public static String GetFilePath() {
+		if(path == null)
+		{
+		    String os = System.getProperty("os.name").toLowerCase();
+		    if (os.contains("win"))
+		    {
+		    	path =  String.valueOf(System.getProperty("user.home")) + "\\AppData\\Roaming\\.FeuArdent\\"; 
+		    }
+		    else if (os.contains("mac")) {
+		    	path =  String.valueOf(System.getProperty("user.home")) + "/Library/Application Support/FeuArdent/";
+		    }
+		    else {
+		    	path = String.valueOf(System.getProperty("user.home")) + "/.FeuArdent/";
+		    }
+		} 
+		return path;
+	  }
     /**
      * Used to register fonts.
      *
@@ -86,7 +103,7 @@ public class FontRegistry {
             Font font = new Font(path);
             fontRegister.put(name, font);
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            e.printStackTrace();
         }
     }
 

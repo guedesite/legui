@@ -67,8 +67,7 @@ public class ProgressBar extends Component {
     }
 
     private void initialize() {
-        Themes.getDefaultTheme().getThemeManager().getComponentTheme(ProgressBar.class).applyAll(this);
-    }
+          }
 
     /**
      * Returns current progress status.

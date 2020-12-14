@@ -1,5 +1,7 @@
 package org.liquidengine.legui.image;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -10,9 +12,6 @@ import org.liquidengine.legui.exception.LeguiException;
 import org.liquidengine.legui.exception.LeguiExceptionTemplate;
 import org.liquidengine.leutil.io.IOUtil;
 import org.lwjgl.stb.STBImage;
-
-import java.io.IOException;
-import java.nio.ByteBuffer;
 
 /**
  * Created by ShchAlexander on 2/6/2017.

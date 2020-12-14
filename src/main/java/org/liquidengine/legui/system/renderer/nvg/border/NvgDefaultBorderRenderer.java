@@ -16,7 +16,7 @@ public class NvgDefaultBorderRenderer extends NvgBorderRenderer {
 
     @Override
     protected void renderBorder(Border border, Component component, Context context, long nanovg) {
-        if (!component.isVisible()) {
+        if (!component.isVisible() || !component.hasBorder) {
             return;
         }
         // render simple rectangle border

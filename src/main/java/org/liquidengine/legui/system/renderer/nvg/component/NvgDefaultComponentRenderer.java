@@ -1,6 +1,5 @@
 package org.liquidengine.legui.system.renderer.nvg.component;
 
-import static org.liquidengine.legui.style.util.StyleUtilities.getStyle;
 import static org.liquidengine.legui.system.renderer.nvg.NvgRenderer.renderBorderWScissor;
 import static org.liquidengine.legui.system.renderer.nvg.NvgRenderer.renderIcon;
 import static org.liquidengine.legui.system.renderer.nvg.util.NvgRenderUtils.createScissor;
@@ -10,8 +9,11 @@ import static org.lwjgl.nanovg.NanoVG.nvgRestore;
 import static org.lwjgl.nanovg.NanoVG.nvgSave;
 
 import org.joml.Vector4f;
+import org.liquidengine.legui.component.AdvancedButton;
 import org.liquidengine.legui.component.Component;
+import org.liquidengine.legui.component.TexturedButton;
 import org.liquidengine.legui.icon.Icon;
+import org.liquidengine.legui.style.Style;
 import org.liquidengine.legui.system.context.Context;
 import org.liquidengine.legui.system.renderer.RendererProvider;
 import org.liquidengine.legui.system.renderer.nvg.NvgComponentRenderer;
@@ -57,19 +59,104 @@ public class NvgDefaultComponentRenderer<C extends Component> extends NvgCompone
     }
 
     protected void renderBackground(C component, Context context, long nanovg) {
-        Icon bgIcon = getStyle(component, s -> s.getBackground().getIcon());
-        Vector4f bgColor = getStyle(component, s -> s.getBackground().getColor());
+        boolean focused = component.isFocused();
+        boolean hovered = component.isHovered();
+        boolean pressed = component.isPressed();
+
+        Style style = component.getStyle();
+        Style currStyle = component.getStyle();
+
+        Icon bgIcon = style.getBackground().getIcon();
+        Vector4f bgColor = style.getBackground().getColor();
         Vector4f cornerRadius = getBorderRadius(component);
 
-        NvgRenderUtils.renderShadow(nanovg, component);
+        if (focused) {
+            currStyle = component.getFocusedStyle();
+          
+            if (currStyle.getBackground().getIcon() != null) {
+                bgIcon = currStyle.getBackground().getIcon();
+            }
+        }
+        if (hovered) {
+            currStyle = component.getHoveredStyle();
+           
+            if (currStyle.getBackground().getIcon() != null) {
+                bgIcon = currStyle.getBackground().getIcon();
+            }
+        }
+        if (pressed) {
+            currStyle = component.getPressedStyle();
+            
+            if (currStyle.getBackground().getIcon() != null) {
+                bgIcon = currStyle.getBackground().getIcon();
+            }
+        }
+
+       NvgRenderUtils.renderShadow(nanovg, component);
 
         nvgSave(nanovg);
-        NvgShapes.drawRect(nanovg, component.getAbsolutePosition(), component.getSize(), bgColor, cornerRadius);
+       NvgShapes.drawRect(nanovg, component.getAbsolutePosition(), component.getSize(), bgColor, cornerRadius);
         if (bgIcon != null) {
             renderIcon(bgIcon, component, context);
         }
         nvgRestore(nanovg);
     }
+    
+    protected void renderAdvancedBackground(AdvancedButton component, Context context, long nanovg) {
+        boolean focused = component.isFocused();
+        boolean hovered = component.isHovered();
+        boolean pressed = component.isPressed();
+
+        Style style = component.getStyle();
+        Style currStyle = component.getStyle();
+
+        Icon bgIcon = style.getBackground().getIcon();
+        Vector4f bgColor = style.getBackground().getColor();
+        Vector4f cornerRadius = getBorderRadius(component);
+
+        if(component.Active)
+        {
+	        if (focused) {
+	            currStyle = component.getFocusedStyle();
+	          
+	            if (currStyle.getBackground().getIcon() != null) {
+	                bgIcon = currStyle.getBackground().getIcon();
+	            }
+	        }
+	        if (hovered) {
+	            currStyle = component.getHoveredStyle();
+	           
+	            if (currStyle.getBackground().getIcon() != null) {
+	                bgIcon = currStyle.getBackground().getIcon();
+	            }
+	        }
+	        if (pressed) {
+	            currStyle = component.getPressedStyle();
+	          
+	            if (currStyle.getBackground().getIcon() != null) {
+	                bgIcon = currStyle.getBackground().getIcon();
+	            }
+	        }
+        } else {
+        	if (focused) {
+	            currStyle = component.getFocusedStyle();
+	          
+	            if (currStyle.getBackground().getIcon() != null) {
+	                bgIcon = currStyle.getBackground().getIcon();
+	            }
+	        }
+        }
+
+   //     NvgRenderUtils.renderShadow(nanovg, component);
+
+        nvgSave(nanovg);
+       NvgShapes.drawRect(nanovg, component.getAbsolutePosition(), component.getSize(), bgColor, cornerRadius);
+        if (bgIcon != null) {
+            renderIcon(bgIcon, component, context);
+        }
+        nvgRestore(nanovg);
+    }
+    
 
     /**
      * Used to render component childComponents.

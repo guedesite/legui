@@ -8,12 +8,10 @@ import org.joml.Vector2f;
 import org.liquidengine.legui.component.optional.align.HorizontalAlign;
 import org.liquidengine.legui.component.optional.align.VerticalAlign;
 
-import java.io.Serializable;
-
 /**
  * Icon. Used to draw component icons.
  */
-public abstract class Icon implements Serializable {
+public abstract class Icon {
 
     /**
      * Icon size.
@@ -80,12 +78,13 @@ public abstract class Icon implements Serializable {
      *
      * @param size size to set.
      */
-    public void setSize(Vector2f size) {
+    public Icon setSize(Vector2f size) {
         if (size != null) {
             this.size = size;
         } else {
             this.size = new Vector2f();
         }
+        return this;
     }
 
     /**

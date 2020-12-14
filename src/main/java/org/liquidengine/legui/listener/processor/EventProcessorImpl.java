@@ -1,13 +1,14 @@
 package org.liquidengine.legui.listener.processor;
 
-import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.liquidengine.legui.component.Component;
 import org.liquidengine.legui.event.Event;
 import org.liquidengine.legui.listener.EventListener;
+
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Default implementation of event processor.
@@ -18,8 +19,7 @@ public class EventProcessorImpl implements EventProcessor {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private Queue<Event> first = new ConcurrentLinkedQueue<>();
-    private Queue<Event> second = new ConcurrentLinkedQueue<>();
+    private Queue<Event> eventQueue = new ConcurrentLinkedQueue<>();
 
 
     /**
@@ -27,9 +27,7 @@ public class EventProcessorImpl implements EventProcessor {
      */
     @Override
     public void processEvents() {
-        swap();
-
-        for (Event event = second.poll(); event != null; event = second.poll()) {
+        for (Event event = eventQueue.poll(); event != null; event = eventQueue.poll()) {
             Component targetComponent = event.getTargetComponent();
             if (targetComponent == null) {
                 return;
@@ -39,12 +37,6 @@ public class EventProcessorImpl implements EventProcessor {
                 listener.process(event);
             }
         }
-    }
-
-    private void swap() {
-        Queue<Event> temp = first;
-        first = second;
-        second = temp;
     }
 
     /**
@@ -57,7 +49,7 @@ public class EventProcessorImpl implements EventProcessor {
         if (event.getContext() != null && event.getContext().isDebugEnabled()) {
             LOGGER.debug(event);
         }
-        first.add(event);
+        eventQueue.add(event);
     }
 
     /**
@@ -67,6 +59,6 @@ public class EventProcessorImpl implements EventProcessor {
      */
     @Override
     public boolean hasEvents() {
-        return !(first.isEmpty() && second.isEmpty());
+        return !eventQueue.isEmpty();
     }
 }

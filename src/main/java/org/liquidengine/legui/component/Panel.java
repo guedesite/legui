@@ -13,8 +13,7 @@ public class Panel extends Component {
      * marshaller/unmarshaller component should contain empty constructor.
      */
     public Panel() {
-        Themes.getDefaultTheme().applyAll(this);
-    }
+        }
 
     /**
      * Constructor with position and size parameters.
@@ -26,8 +25,7 @@ public class Panel extends Component {
      */
     public Panel(float x, float y, float width, float height) {
         super(x, y, width, height);
-        Themes.getDefaultTheme().applyAll(this);
-    }
+         }
 
     /**
      * Constructor with position and size parameters.
@@ -37,7 +35,6 @@ public class Panel extends Component {
      */
     public Panel(Vector2f position, Vector2f size) {
         super(position, size);
-        Themes.getDefaultTheme().applyAll(this);
-    }
+        }
 
 }

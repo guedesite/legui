@@ -38,8 +38,7 @@ public class ImageView extends Component {
      * This method used to initialize image view component.
      */
     private void initialize() {
-        Themes.getDefaultTheme().getThemeManager().getComponentTheme(ImageView.class).applyAll(this);
-    }
+          }
 
     /**
      * Returns image of image view.
@@ -57,6 +56,7 @@ public class ImageView extends Component {
      */
     public void setImage(Image image) {
         this.image = image;
+        this.image.HasChange = true;
     }
 
     @Override
